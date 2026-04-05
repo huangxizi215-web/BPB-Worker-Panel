@@ -4,7 +4,8 @@
         "target": "esnext",
         "module": "esnext",
         "types": ["@cloudflare/workers-types"],
-        "moduleResolution": "node16",
+        "moduleResolution": "node",
+        "ignoreDeprecations": "6.0"
         "baseUrl": "src",
         "strict": true,
         "esModuleInterop": true,
