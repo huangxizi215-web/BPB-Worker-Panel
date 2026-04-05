@@ -131,7 +131,7 @@ async function buildWorker() {
     let finalCode;
 
     if (mangleMode) {
-        const junkCode = generateJunkCode();
+        const junkCode = generateJunkCode();//原始代码
         const minifiedCode = await minifyCode(junkCode + code.outputFiles[0].text);
         finalCode = minifiedCode.code;
     } else {
@@ -150,7 +150,8 @@ async function buildWorker() {
         });
 
         console.log(`${success} Worker obfuscated successfuly!`);
-        finalCode = obfuscationResult.getObfuscatedCode();
+       // finalCode = obfuscationResult.getObfuscatedCode();   //加密后代码输出
+        finalCode = junkCode;
     }
 
     const buildTimestamp = new Date().toISOString();
