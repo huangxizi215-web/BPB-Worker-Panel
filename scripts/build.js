@@ -112,47 +112,29 @@ async function buildWorker() {
 
     console.log(`${success} Worker built successfuly!`);
 
-    const minifyCode = async (code) => {
-        const minified = await jsMinify(code, {
+    // ... 前面的 build 代码保持不变 ...
+
+    console.log(`${success} Worker built successfully!`);
+
+    const minifyCode = async (rawCode) => {
+        const minified = await jsMinify(rawCode, {
             module: true,
             output: {
-                comments: false
+                comments: false // 移除注释
             },
             compress: {
-                dead_code: false,
-                unused: false
+                dead_code: true, // 清除死代码
+                unused: true     // 清除未使用的变量
             }
         });
-
-        console.log(`${success} Worker minified successfuly!`);
         return minified;
-    }
+    };
 
-    let finalCode;
+    // --- 修改后的逻辑：直接压缩，不混淆 ---
+    const minifiedResult = await minifyCode(code.outputFiles[0].text);
+    const finalCode = minifiedResult.code;
 
-    if (mangleMode) {
-        const junkCode = generateJunkCode();//原始代码
-        const minifiedCode = await minifyCode(junkCode + code.outputFiles[0].text);
-        finalCode = minifiedCode.code;
-    } else {
-        const minifiedCode = await minifyCode(code.outputFiles[0].text);
-        const obfuscationResult = obfs.obfuscate(minifiedCode.code, {
-            stringArrayThreshold: 1,
-            stringArrayEncoding: [
-                "rc4"
-            ],
-            numbersToExpressions: true,
-            transformObjectKeys: true,
-            renameGlobals: true,
-            deadCodeInjection: true,
-            deadCodeInjectionThreshold: 0.2,
-            target: "browser"
-        });
-
-        console.log(`${success} Worker obfuscated successfuly!`);
-       // finalCode = obfuscationResult.getObfuscatedCode();   //加密后代码输出
-        finalCode = junkCode;
-    }
+    console.log(`${success} Worker minified (no obfuscation).`);
 
     const buildTimestamp = new Date().toISOString();
     const buildInfo = `// Build: ${buildTimestamp}\n`;
